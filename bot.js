@@ -16,7 +16,7 @@ module.exports = function (req, res, next) {
 
     botPayload = {
       userName:'pluto',
-      text : 'Okay lets start!\n\r 1.What did you do yesterday?\n\r 2.What are you working on today?\n\r 3.Any Blockers?\n\r When you\'re done type "!next!"\n\r\n\r Right so who\'s going first?\n\r To speak next type "!me"'
+      text : 'Okay lets start!\n\r\n\r 1.What did you do yesterday?\n\r 2.What are you working on today?\n\r 3.Any Blockers?\n\r\n\r When you\'re done type "!next!"\n\r If you want tp speak next type "!me" \n\r\n\r Right so who\'s going first? '+userName+'?'
     };
 
   }else if(text == "!next")
@@ -24,7 +24,7 @@ module.exports = function (req, res, next) {
 
     botPayload = {
       userName:'pluto',
-      text : 'Okay guys whos next?'
+      text : 'Okay guys who\'s next?'
     };
 
   }else if(text == "!me")
@@ -33,6 +33,15 @@ module.exports = function (req, res, next) {
     botPayload = {
       userName:'pluto',
       text : 'Great, so '+userName+' you\'re next.\n\rYou may start'
+    };
+
+  }
+  else if(text == "!end")
+  {
+
+    botPayload = {
+      userName:'pluto',
+      text : 'That concludes todays stand up!'
     };
 
   }
