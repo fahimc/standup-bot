@@ -11,7 +11,14 @@ module.exports = function (req, res, next) {
       text : 'Good Morning, @' + channelName + '! Please type "!start" when you are ready to stand up'
     };
 
-  }else{
+  }
+  if(text == "!start")
+  {
+
+    botPayload = {
+      userName:'pluto',
+      text : 'Okay lets start!\n\r 1.What did you do yesterday?'
+    };
 
   }
 
