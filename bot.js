@@ -1,5 +1,6 @@
 var Slack = {
   currentUserName:null,
+  previousUserName:null,
   channelName:null,
   userList:{},
   callbacks:[],
@@ -8,6 +9,7 @@ var Slack = {
   onMessage:function(req, res, next){
     this.request = req;
     this.response = res;
+    this.previousUserName = this.currentUserName;
     this.currentUserName = req.body.user_name;
     this.userList[this.currentUserName] = this.currentUserName;
     this.channelName = req.body.channel_name;
