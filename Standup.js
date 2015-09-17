@@ -21,7 +21,7 @@ var Standup ={
 		this.getResponse(text);
 	},
 	getResponse:function(text){
-		if(this.Slack.currentUserName == this.name){
+		if(this.Slack.currentUserName == 'slackbot'){
 			this.Slack.send(null,null);
 			return;
 		}
