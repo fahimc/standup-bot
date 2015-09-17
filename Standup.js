@@ -21,7 +21,10 @@ var Standup ={
 		this.getResponse(text);
 	},
 	getResponse:function(text){
-		if(this.Slack.currentUserName == this.name)return;
+		if(this.Slack.currentUserName == this.name){
+			this.Slack.send(null,null);
+			return;
+		}
 			//check start
 			if(this.started && text.indexOf("!standup") < 0 )
 			{
@@ -61,7 +64,7 @@ var Standup ={
 				console.log(this.selected);
 				console.log(this.list);
 				if(this.isDone){
-						this.Slack.send(this.name,this.replace(this.responses.done));
+					this.Slack.send(this.name,this.replace(this.responses.done));
 				}
 				else if(this.size(this.selected) == this.list.length)
 				{
