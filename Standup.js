@@ -1,5 +1,5 @@
 var Standup ={
-	name:"Pluto",
+	name:"pluto",
 	responses:{
 		start:'Good Morning, @channelName!\n\r Please type "!start" when you are ready to stand up',
 		first:'Okay lets start!\n\r\n\r 1.What did you do yesterday?\n\r 2.What are you working on today?\n\r 3.Any Blockers?\n\r\n\r When you\'re done type "!next!"\n\r\n\r Right so @userName will go first!',
@@ -21,6 +21,7 @@ var Standup ={
 		this.getResponse(text);
 	},
 	getResponse:function(text){
+		if(this.Slack.currentUserName == this.name)return;
 			//check start
 			if(this.started && text.indexOf("!standup") < 0 )
 			{
