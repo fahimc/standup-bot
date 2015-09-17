@@ -21,7 +21,7 @@ var Standup ={
 		this.getResponse(text);
 	},
 	getResponse:function(text){
-		if(this.Slack.currentUserName == this.name){
+		if(this.Slack.currentUserName == 'slackbot'){
 			this.Slack.send(null,null);
 			return;
 		}
@@ -95,9 +95,9 @@ var Standup ={
 			return this.list[index];
 		},
 		replace:function(text,name,previous){
-			text = text.replace("@channelName!",this.Slack.channelName);
-			if(name)text = text.replace("@userName",name.trim());
-			if(previous)text = text.replace("@previousUserName",previous.trim());
+			text = text.replace("@channelName!","#"+this.Slack.channelName);
+			if(name)text = text.replace("@userName","@"+name.trim());
+			if(previous)text = text.replace("@previousUserName","@"+previous.trim());
 
 			return text;
 		},
