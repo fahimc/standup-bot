@@ -21,6 +21,7 @@ var Standup ={
 		this.getResponse(text);
 	},
 	getResponse:function(text){
+		if(this.Slack.currentUserName == this.name)return;
 			//check start
 			if(this.started && text.indexOf("!standup") < 0 )
 			{
