@@ -6,7 +6,8 @@ var Standup ={
 		next:'Great @previousUserName.\n\r@userName you\'re next!',
 		last:'Thanks @previousUserName. @userName you\'re the last one',
 		done:'Thanks Everyone Stand up is now complete. Have a productive day',
-		interupted:'@userName, please allow @previousUserName to finish and type !next or !end'
+		interupted:'@userName, please allow @previousUserName to finish and type !next or !end',
+		cancel:'!standup has been cancelled by @userName'
 	},
 	Slack:null,
 	started:false,
@@ -25,6 +26,12 @@ var Standup ={
 	getResponse:function(text){
 		if(this.Slack.currentUserName == 'slackbot'){
 			this.Slack.send(null,null);
+			return;
+		}
+		if(text.indexOf("!cancel") >= 0 ){
+			this.started=false;
+			this.isNext =false;
+			this.Slack.send(this.name,this.replace(this.responses.cancel,this.Slack.currentUserName));
 			return;
 		}
 		if(this.isNext && this.Slack.currentUserName.trim() != this.previousPerson.trim())
