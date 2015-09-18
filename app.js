@@ -1,13 +1,11 @@
-var Slack = require('./bot');
-var Pluto = require('./Pluto');
+var Slack = require('./Slack');
 var Standup = require('./Standup');
 var express = require('express');
 var bodyParser = require('body-parser');
 var app = express();
 
-// Pluto.init(Slack);
+
 Standup.init(Slack);
-// Slack.addCallback(Pluto.onMessage.bind(Pluto));
 Slack.addCallback(Standup.onMessage.bind(Standup));
 
 var port = process.env.PORT || 3000;

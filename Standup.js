@@ -2,15 +2,17 @@ var Standup ={
 	name:"pluto",
 	responses:{
 		start:'Good Morning, @channelName!\n\r Please type "!start" when you are ready to stand up',
-		first:'Okay lets start!\n\r\n\r 1.What did you do yesterday?\n\r 2.What are you working on today?\n\r 3.Any Blockers?\n\r\n\r When you\'re done type "!next!"\n\r\n\r Right so @userName will go first!',
+		first:'Okay lets start!\n\r\n\r 1.What did you do yesterday?\n\r 2.What are you working on today?\n\r 3.Any Blockers?\n\r\n\r When you\'re done type "!next!" or "!end" when everyone is finished\n\r\n\r Right so @userName will go first!',
 		next:'Great @previousUserName.\n\r@userName you\'re next!',
 		last:'Thanks @previousUserName. @userName you\'re the last one',
-		done:'Thanks Everyone Stand up is now complete. Have a productive day'
+		done:'Thanks Everyone Stand up is now complete. Have a productive day',
+		interupted:'@userName, please allow @previousUserName to finish and type !next or !end'
 	},
 	Slack:null,
 	started:false,
 	saidStart:false,
 	isDone:false,
+	isNext:false,
 	list:[],
 	previousPerson:'',
 	selected:{},
@@ -23,6 +25,11 @@ var Standup ={
 	getResponse:function(text){
 		if(this.Slack.currentUserName == 'slackbot'){
 			this.Slack.send(null,null);
+			return;
+		}
+		if(this.isNext && this.Slack.currentUserName.trim() != this.previousPerson.trim())
+		{
+			this.Slack.send(this.name,this.replace(this.responses.interupted,this.Slack.currentUserName,this.previousPerson));
 			return;
 		}
 			//check start
@@ -49,11 +56,15 @@ var Standup ={
 				var name = this.getNextPerson();
 				this.previousPerson = name;
 				this.saidStart=true;
+				this.isNext=true;
 				this.Slack.send(this.name,this.replace(this.responses.first,name));
 			}else if(text.indexOf("!next") >=0){
+				this.isNext=true;
 				this.next();
-			}	
-			else{
+			}else if(text.indexOf("!end") >=0){
+				this.isNext = false;
+				this.Slack.send(this.name,this.replace(this.responses.done));
+			}else{
 				this.Slack.send(null,null);
 			}
 		},
@@ -61,9 +72,8 @@ var Standup ={
 			if(this.saidStart)
 			{
 				var name = this.getNextPerson();	
-				console.log(this.selected);
-				console.log(this.list);
 				if(this.isDone){
+					this.isNext = false;
 					this.Slack.send(this.name,this.replace(this.responses.done));
 				}
 				else if(this.size(this.selected) == this.list.length)
@@ -92,7 +102,7 @@ var Standup ={
 					found=true;
 				}
 			}
-			return this.list[index];
+			return this.list[index].trim();
 		},
 		replace:function(text,name,previous){
 			text = text.replace("@channelName!","#"+this.Slack.channelName);
