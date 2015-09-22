@@ -36,7 +36,13 @@ var Standup ={
 		}else if(text.indexOf("!remove:") >= 0 ){
 			var name = text.replace("!remove:","").trim();
 			var removed = this.removeMember(name);
-			this.Slack.send(this.name,this.replace(this.responses.removed,name));
+			if(this.previousPerson == name)
+			{
+				this.isNext=true;
+				this.next();
+			}else{
+				this.Slack.send(this.name,this.replace(this.responses.removed,name));
+			}
 			return;
 		}
 		if(this.isNext && this.Slack.currentUserName.trim() != this.previousPerson.trim())
@@ -136,10 +142,10 @@ var Standup ={
 		removeMember:function(name){
 			var found = false;
 			for(var a=0;a<this.list.length;a++){
-					if(name.trim() == this.list[a]){
-							this.selected[a] = true;
-							found = true;
-					}
+				if(name.trim() == this.list[a]){
+					this.selected[a] = true;
+					found = true;
+				}
 			}
 			return found;
 		},
