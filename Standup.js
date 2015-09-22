@@ -7,6 +7,7 @@ var Standup ={
 		last:'Thanks @previousUserName. @userName you\'re the last one',
 		done:'Thanks Everyone Stand up is now complete. Have a productive day',
 		interupted:'@userName, please allow @previousUserName to finish and type !next or !end',
+		removed:'@userName has been removed from the standup list',
 		cancel:'!standup has been cancelled by @userName'
 	},
 	Slack:null,
@@ -24,14 +25,18 @@ var Standup ={
 		this.getResponse(text);
 	},
 	getResponse:function(text){
-		if(this.Slack.currentUserName == 'slackbot'){
+		if(this.Slack.currentUserName.trim() == 'slackbot'){
 			this.Slack.send(null,null);
 			return;
 		}
 		if(text.indexOf("!cancel") >= 0 ){
-			this.started=false;
-			this.isNext =false;
+			this.purge();
 			this.Slack.send(this.name,this.replace(this.responses.cancel,this.Slack.currentUserName));
+			return;
+		}else if(text.indexOf("!remove:") >= 0 ){
+			var name = text.replace("!remove:","").trim();
+			var removed = this.removeMember(name);
+			this.Slack.send(this.name,this.replace(this.responses.removed,name));
 			return;
 		}
 		if(this.isNext && this.Slack.currentUserName.trim() != this.previousPerson.trim())
@@ -50,12 +55,20 @@ var Standup ={
 		checkStart:function(text){
 			var trigger = "!standup:";
 			if(text.indexOf(trigger) >= 0){
+				this.purge();
 				this.list = text.replace(trigger,"").split(",");
+				this.trim();
 				this.started = true;
 				this.selected = {};
 				this.Slack.send(this.name,this.replace(this.responses.start));
 			}else{
 				this.Slack.send(null,null);
+			}
+		},
+		trim:function(){
+			for(var a=0;a<this.list.length;a++){
+				this.list[a] = this.list[a].trim();
+				console.log(this.list[a]);
 			}
 		},
 		listen:function(text){
@@ -69,7 +82,7 @@ var Standup ={
 				this.isNext=true;
 				this.next();
 			}else if(text.indexOf("!end") >=0){
-				this.isNext = false;
+				this.purge();
 				this.Slack.send(this.name,this.replace(this.responses.done));
 			}else{
 				this.Slack.send(null,null);
@@ -80,7 +93,7 @@ var Standup ={
 			{
 				var name = this.getNextPerson();	
 				if(this.isDone){
-					this.isNext = false;
+					this.purge();
 					this.Slack.send(this.name,this.replace(this.responses.done));
 				}
 				else if(this.size(this.selected) == this.list.length)
@@ -105,8 +118,10 @@ var Standup ={
 				index = Math.floor(Math.random()*((this.list.length-1)-0+1)+0);
 				if(!this.selected[index])
 				{
-					this.selected[index] = index;
+					this.selected[index] = true;
+					console.log("found index",index,this.list[index]);
 					found=true;
+					break;
 				}
 			}
 			return this.list[index].trim();
@@ -117,6 +132,24 @@ var Standup ={
 			if(previous)text = text.replace("@previousUserName","@"+previous.trim());
 
 			return text;
+		},
+		removeMember:function(name){
+			var found = false;
+			for(var a=0;a<this.list.length;a++){
+					if(name.trim() == this.list[a]){
+							this.selected[a] = true;
+							found = true;
+					}
+			}
+			return found;
+		},
+		purge:function(){
+			this.started=false;
+			this.isDone=false;
+			this.saidStart=false;
+			this.isNext=false;
+			this.list=[];
+			this.selected={};
 		},
 		size: function(obj) {
 			var size = 0, key;
