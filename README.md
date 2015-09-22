@@ -5,4 +5,5 @@
 `!next`    : To move to the next person  
 `!end`   :  To end your turn  
 `!cancel`  :  To cancel the standup  
+`!remove: name`  :  To remove a person from a standup  
 
